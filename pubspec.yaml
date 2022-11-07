@@ -1,9 +1,9 @@
 name: custom_navigation_bar
 description: A custom navigation bar with bubble click effect. Inspired by The
              Boring Flutter Development Show EP. 35.
-version: 0.8.3
+version: 0.8.4
 homepage: https://github.com/rickywen911/custom_bubble_navigation_bar
-publish_to: all
+publish_to: none
 
 environment:
   sdk: ">=2.17.5 <3.0.0"
