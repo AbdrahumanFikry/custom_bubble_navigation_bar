@@ -9,7 +9,7 @@
 // copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -29,7 +29,7 @@ class CustomNavigationBar extends StatefulWidget {
   /// create a [CustomNavigationBar]
   ///
   const CustomNavigationBar({
-    Key? key,
+    super.key,
     required this.items,
     this.duration = const Duration(milliseconds: 300),
     this.scaleDuration = const Duration(milliseconds: 400),
@@ -48,10 +48,12 @@ class CustomNavigationBar extends StatefulWidget {
     this.isFloating = false,
     this.blurEffect = false,
     this.opacity = 0.8,
+    this.spaceBetween = 0.0,
+    this.margin,
+    this.padding,
   })  : assert(scaleFactor <= 0.5, 'Scale factor must smaller than 0.5'),
         assert(scaleFactor > 0, 'Scale factor must bigger than 0'),
-        assert(0 <= currentIndex && currentIndex < items.length),
-        super(key: key);
+        assert(0 <= currentIndex && currentIndex < items.length);
 
   ///
   /// Animation duration
@@ -148,13 +150,29 @@ class CustomNavigationBar extends StatefulWidget {
   ///
   final double opacity;
 
+  ///
+  ///Add [margin] is applied if [floating] is true
+  /// default is EdgeInsets.only(left: 16, right: 16, bottom: MediaQuery.of(context).padding.bottom)
+  ///
+  final EdgeInsets? margin;
+
+  ///
+  /// default is EdgeInsets.zero
+  ///
+  final EdgeInsets? padding;
+
+  ///
+  /// default is 0.0
+  ///
+  final double spaceBetween;
+
   @override
   _CustomNavigationBarState createState() => _CustomNavigationBarState();
 }
 
 class _CustomNavigationBarState extends State<CustomNavigationBar>
     with TickerProviderStateMixin {
-  late List<double> _radiuses;
+  late List<double> _allRadius;
   late List<double> _sizes;
   AnimationController? _controller;
   AnimationController? _scaleController;
@@ -168,7 +186,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
   void initState() {
     super.initState();
     _bubbleRadius = 0.0;
-    _radiuses = List<double>.generate(widget.items.length, (index) {
+    _allRadius = List<double>.generate(widget.items.length, (index) {
       return _bubbleRadius;
     });
 
@@ -200,15 +218,15 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
       vsync: this,
       duration: widget.duration,
     );
-    final CurvedAnimation _curvedAnimation = CurvedAnimation(
+    final CurvedAnimation curvedAnimation = CurvedAnimation(
       parent: _controller!,
       curve: widget.bubbleCurve,
     );
     Tween<double>(begin: 0.0, end: 1.0)
-        .animate(_curvedAnimation)
+        .animate(curvedAnimation)
         .addListener(() {
       setState(() {
-        _radiuses[index] = _maxRadius! * _curvedAnimation.value;
+        _allRadius[index] = _maxRadius! * curvedAnimation.value;
       });
     });
     _controller!.forward();
@@ -223,17 +241,15 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
           _scaleController?.reverse();
         }
       });
-    final _scaleAnimation = CurvedAnimation(
+    final scaleAnimation = CurvedAnimation(
       parent: _scaleController!,
       curve: widget.scaleCurve,
       reverseCurve: widget.scaleCurve.flipped,
     );
 
-    Tween<double>(begin: 0.0, end: 1.0)
-        .animate(_scaleAnimation)
-        .addListener(() {
+    Tween<double>(begin: 0.0, end: 1.0).animate(scaleAnimation).addListener(() {
       setState(() {
-        _sizes[index] = _scaleAnimation.value * widget.scaleFactor;
+        _sizes[index] = scaleAnimation.value * widget.scaleFactor;
       });
     });
     _scaleController!.forward();
@@ -264,7 +280,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
       child: CustomPaint(
         painter: BeaconPainter(
           color: widget.strokeColor,
-          beaconRadius: _radiuses[index],
+          beaconRadius: _allRadius[index],
           maxRadius: _maxRadius,
           offset: Offset(
             widget.iconSize / 2,
@@ -308,8 +324,10 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
     final bar = Material(
       color: widget.backgroundColor,
       elevation: widget.elevation,
-      borderRadius: BorderRadius.all(
-        widget.borderRadius,
+      shape: ContinuousRectangleBorder(
+        borderRadius: BorderRadius.all(
+          widget.borderRadius,
+        ),
       ),
       child: SizedBox(
         height: height,
@@ -322,14 +340,19 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
-                    widget.onTap!(i);
+                    if (widget.onTap != null) widget.onTap!.call(i);
                   },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildIcon(i),
-                      _buildLabel(i),
-                    ],
+                  child: Container(
+                    color: Colors.transparent,
+                    padding: widget.padding ?? EdgeInsets.zero,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildIcon(i),
+                        SizedBox(height: widget.spaceBetween),
+                        _buildLabel(i),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -338,15 +361,25 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
       ),
     );
 
+    EdgeInsets margin = EdgeInsets.only(
+      left: 16,
+      right: 16,
+      bottom: additionalBottomPadding,
+    );
+
+    if (widget.isFloating && widget.margin != null) {
+      margin = EdgeInsets.only(
+        top: widget.margin!.top,
+        left: widget.margin!.left,
+        right: widget.margin!.right,
+        bottom: widget.margin!.bottom + additionalBottomPadding,
+      );
+    } else {
+      margin = EdgeInsets.zero;
+    }
     if (widget.blurEffect) {
       return Padding(
-        padding: widget.isFloating
-            ? EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: additionalBottomPadding,
-              )
-            : EdgeInsets.zero,
+        padding: margin,
         child: ClipRRect(
           borderRadius: BorderRadius.all(
             widget.borderRadius,
@@ -365,13 +398,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
       );
     } else {
       return Padding(
-        padding: widget.isFloating
-            ? EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: additionalBottomPadding,
-              )
-            : EdgeInsets.zero,
+        padding: margin,
         child: bar,
       );
     }
@@ -380,7 +407,6 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
 
 class _CustomNavigationBarTile extends StatelessWidget {
   const _CustomNavigationBarTile({
-    Key? key,
     this.selected,
     this.item,
     this.selectedColor,
@@ -388,7 +414,7 @@ class _CustomNavigationBarTile extends StatelessWidget {
     this.scale,
     this.iconSize,
     this.iconPadding,
-  }) : super(key: key);
+  });
 
   final bool? selected;
 
