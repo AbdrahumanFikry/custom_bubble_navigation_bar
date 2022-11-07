@@ -274,21 +274,22 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
   }
 
   Widget _buildIcon(int index) {
+    final size = widget.items[index].iconSize ?? widget.iconSize;
     return SizedBox(
-      height: widget.iconSize,
-      width: widget.iconSize,
+      height: size,
+      width: size,
       child: CustomPaint(
         painter: BeaconPainter(
           color: widget.strokeColor,
           beaconRadius: _allRadius[index],
           maxRadius: _maxRadius,
           offset: Offset(
-            widget.iconSize / 2,
-            widget.iconSize / 2,
+            size / 2,
+            size / 2,
           ),
         ),
         child: _CustomNavigationBarTile(
-          iconSize: widget.iconSize,
+          iconSize: size,
           scale: _sizes[index],
           selected: index == widget.currentIndex,
           item: widget.items[index],

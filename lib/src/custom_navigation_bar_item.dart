@@ -28,6 +28,7 @@ class CustomNavigationBarItem {
     Text? selectedTitle,
     this.badgeCount = 0,
     this.showBadge = false,
+    this.iconSize,
   })  : selectedIcon = selectedIcon ?? icon,
         selectedTitle = selectedTitle ?? title;
 
@@ -60,4 +61,9 @@ class CustomNavigationBarItem {
 
   /// hide or show badge
   final bool showBadge;
+
+  ///
+  /// [iconSize] a special icon size of the item
+  ///
+  final double? iconSize;
 }
