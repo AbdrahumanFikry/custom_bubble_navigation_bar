@@ -50,7 +50,7 @@ class CustomNavigationBar extends StatefulWidget {
     this.opacity = 0.8,
     this.spaceBetween = 0.0,
     this.margin,
-    this.padding,
+    this.itemPadding,
   })  : assert(scaleFactor <= 0.5, 'Scale factor must smaller than 0.5'),
         assert(scaleFactor > 0, 'Scale factor must bigger than 0'),
         assert(0 <= currentIndex && currentIndex < items.length);
@@ -159,7 +159,7 @@ class CustomNavigationBar extends StatefulWidget {
   ///
   /// default is EdgeInsets.zero
   ///
-  final EdgeInsets? padding;
+  final EdgeInsets? itemPadding;
 
   ///
   /// default is 0.0
@@ -344,7 +344,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
                   },
                   child: Container(
                     color: Colors.transparent,
-                    padding: widget.padding ?? EdgeInsets.zero,
+                    padding: widget.itemPadding ?? EdgeInsets.zero,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
