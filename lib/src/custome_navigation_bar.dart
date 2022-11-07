@@ -50,7 +50,7 @@ class CustomNavigationBar extends StatefulWidget {
     this.opacity = 0.8,
     this.spaceBetween = 0.0,
     this.margin,
-    this.itemPadding,
+    this.padding,
   })  : assert(scaleFactor <= 0.5, 'Scale factor must smaller than 0.5'),
         assert(scaleFactor > 0, 'Scale factor must bigger than 0'),
         assert(0 <= currentIndex && currentIndex < items.length);
@@ -159,7 +159,7 @@ class CustomNavigationBar extends StatefulWidget {
   ///
   /// default is EdgeInsets.zero
   ///
-  final EdgeInsets? itemPadding;
+  final EdgeInsets? padding;
 
   ///
   /// default is 0.0
@@ -308,7 +308,9 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
         math.max(MediaQuery.of(context).padding.bottom, 0.0);
 
     final height = DefaultCustomNavigationBarStyle.defaultHeight +
-        (widget.isFloating ? 0.0 : additionalBottomPadding);
+        (widget.isFloating ? 0.0 : additionalBottomPadding) +
+        (widget.padding?.top ?? 0.0) +
+        (widget.padding?.bottom ?? 0.0);
 
     _itemPadding = (MediaQuery.of(context).size.width -
             widget.items.length * widget.iconSize) /
@@ -332,19 +334,18 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
       child: SizedBox(
         height: height,
         width: MediaQuery.of(context).size.width,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            for (var i = 0; i < widget.items.length; i++)
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    if (widget.onTap != null) widget.onTap!.call(i);
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    padding: widget.itemPadding ?? EdgeInsets.zero,
+        child: Padding(
+          padding: widget.padding ?? EdgeInsets.zero,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              for (var i = 0; i < widget.items.length; i++)
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      if (widget.onTap != null) widget.onTap!.call(i);
+                    },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -355,8 +356,8 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
