@@ -310,7 +310,8 @@ class _CustomNavigationBarState extends State<CustomNavigationBar>
     final height = DefaultCustomNavigationBarStyle.defaultHeight +
         (widget.isFloating ? 0.0 : additionalBottomPadding) +
         (widget.padding?.top ?? 0.0) +
-        (widget.padding?.bottom ?? 0.0);
+        (widget.padding?.bottom ?? 0.0) +
+        widget.spaceBetween;
 
     _itemPadding = (MediaQuery.of(context).size.width -
             widget.items.length * widget.iconSize) /
