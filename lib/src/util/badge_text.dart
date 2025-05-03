@@ -25,8 +25,8 @@ class BadgeText extends StatelessWidget {
           ? Container(
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: BoxShape.circle,
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(8),
               ),
               constraints: const BoxConstraints(
                 minWidth: 12,
