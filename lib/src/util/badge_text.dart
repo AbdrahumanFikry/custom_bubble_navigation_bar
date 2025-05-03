@@ -25,8 +25,8 @@ class BadgeText extends StatelessWidget {
           ? Container(
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(6),
+                color: Theme.of(context).primaryColor,
+                shape: BoxShape.circle,
               ),
               constraints: const BoxConstraints(
                 minWidth: 12,
@@ -36,7 +36,7 @@ class BadgeText extends StatelessWidget {
                 count?.toString() ?? '',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 10,
+                  fontSize: 9,
                 ),
                 textAlign: TextAlign.center,
               ),
