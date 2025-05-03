@@ -33,10 +33,10 @@ class BadgeText extends StatelessWidget {
                 minHeight: 12,
               ),
               child: Text(
-                count! > 10 ? '10+' : '$count',
+                count?.toString() ?? '',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 6,
+                  fontSize: 10,
                 ),
                 textAlign: TextAlign.center,
               ),
